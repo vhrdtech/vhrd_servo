@@ -21,7 +21,7 @@ use crate::hal::{
 
 #[entry]
 fn main() -> ! {
-    let mut output = jlink_rtt::NonBlockingOutput::new();
+    let mut output = jlink_rtt::NonBlockingOutput::new(false);
     //let mut output = jlink_rtt::Output::new();
     let _ = output.write("vhrd-micro-servo ");
     let _ = output.write(env!("CARGO_PKG_VERSION"));
@@ -39,7 +39,7 @@ fn main() -> ! {
 
 
             let can = p.CAN;
-            let mut tja1042_standby_pin = gpioa.pa15.into_push_pull_output(&cs);
+            let mut tja1042_standby_pin = gpioa.pa6.into_push_pull_output(&cs);
             tja1042_standby_pin.set_low();
 
             unsafe {
@@ -136,14 +136,14 @@ fn main() -> ! {
 
 
 
-            let mut drv_en = gpioa.pa7.into_push_pull_output(cs);
+            let mut drv_en = gpiob.pb1.into_push_pull_output(cs);
             let mut drv_ph = gpiob.pb0.into_push_pull_output(cs);
-            let mut drv_sleep = gpiob.pb1.into_push_pull_output(cs);
+            let mut drv_sleep = gpioa.pa7.into_push_pull_output(cs);
 
             let mut angle_in = gpioa.pa3.into_analog(cs);
             let mut adc = hal::adc::Adc::new(p.ADC, &mut rcc);
 
-            let mut led = gpiof.pf0.into_push_pull_output(cs);
+            let mut led = gpioa.pa4.into_push_pull_output(cs);
 
             drv_sleep.set_high();
 
@@ -242,7 +242,7 @@ fn main() -> ! {
 
 #[panic_handler]
 fn panic(panic_info: &PanicInfo) -> ! {
-    let mut output = jlink_rtt::NonBlockingOutput::new();
+    let mut output = jlink_rtt::NonBlockingOutput::new(false);
     let payload = panic_info.payload().downcast_ref::<&str>();
     let mut buffer = [0_u8; 8];
     match (panic_info.location(), payload) {
